@@ -3,7 +3,7 @@ import boto3
 import pandas as pd
 from netaddr import IPNetwork
 
-def create_vpcs(df, filename):
+def create_aws_vpcs(df, filename):
     df = df[df['cloud'] == 'aws']
     df['vpc_id'] = ''
 
@@ -22,7 +22,7 @@ def create_vpcs(df, filename):
 
     df.to_csv(filename, index=False)
 
-def delete_vpcs(df, filename):
+def delete_aws_vpcs(df, filename):
     for index, row in df.iterrows():
         if pd.isnull(row['vpc_id']) or row['cloud'] != 'aws':
             continue
@@ -62,9 +62,9 @@ def main():
     df = pd.read_csv(filename)
 
     if delete_flag == "--delete":
-        delete_vpcs(df, filename)
+        delete_aws_vpcs(df, filename)
     else:
-        create_vpcs(df, filename)
+        create_aws_vpcs(df, filename)
 
 if __name__ == "__main__":
     main()
