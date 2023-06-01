@@ -1,3 +1,5 @@
-name,region,cloud,cidr
-vpc1,us-east-1,aws,10.5.0.0/16
-vpc2,us-east-2,aws,10.6.0.0/16
+name,region,cloud,cidr,resource_group,resource_id
+vpc1,us-east-1,aws,10.1.0.0/16,,
+vpc2,us-east-2,aws,10.2.0.0/16,,
+vnet1,eastus2,azure,10.3.0.0/16,resource-group-a,
+vnet2,centralus,azure,10.4.0.0/16,resource-group-b,
