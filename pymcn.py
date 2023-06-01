@@ -6,6 +6,8 @@ from netaddr import IPNetwork
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.network import NetworkManagementClient
 from azure.mgmt.network.models import VirtualNetwork, Subnet
+from google.cloud import compute_v1
+from google.auth import exceptions
 
 def create_aws_vpcs(df):
     for index, row in df.iterrows():
@@ -79,6 +81,76 @@ def delete_azure_vnets(df):
             async_vnet_deletion.wait()
             df.at[index, 'resource_id'] = pd.NA
 
+def create_gcp_vpcs(df):
+    for index, row in df.iterrows():
+        if row['cloud'] == 'gcp' and pd.isnull(row['resource_id']):
+            project_id = row['project_id']
+            client = compute_v1.NetworksClient()
+
+            network = compute_v1.Network(
+                name=row['name'],
+                auto_create_subnetworks=False,
+            )
+
+            try:
+                operation = client.insert(project=project_id, network_resource=network)
+                operation.result()
+
+                # Get the created network
+                network = client.get(project=project_id, network=row['name'])
+                network_id = network.self_link.split('/')[-1]
+
+                df.at[index, 'resource_id'] = network_id
+
+                networks = list(IPNetwork(row['cidr']).subnet(24))
+
+                subnetwork_client = compute_v1.SubnetworksClient()
+
+                num_of_subnets = 2  # Change this to the number of subnets you want to create
+                for i in range(num_of_subnets):
+                    subnet = compute_v1.Subnetwork(
+                        name='subnet' + str(i),
+                        ip_cidr_range=str(networks[i]),
+                        region=row['region'],
+                        network=network.self_link
+                    )
+                    operation = subnetwork_client.insert(project=project_id, region=row['region'], subnetwork_resource=subnet)
+                    operation.result()
+
+            except exceptions.GoogleAuthError as e:
+                print(f"Failed to create VPC in GCP for project {project_id}. Error: {e}")
+
+def delete_gcp_vpcs(df):
+    for index, row in df.iterrows():
+        if row['cloud'] == 'gcp' and not pd.isnull(row['resource_id']):
+            project_id = row['project_id']
+            client = compute_v1.NetworksClient()
+
+            # Get the network
+            network = client.get(project=project_id, network=row['name'])
+
+            # Get the list of subnetworks
+            subnetworks_client = compute_v1.SubnetworksClient()
+            aggregated_list = subnetworks_client.aggregated_list(project=project_id)
+
+            for region_uri, subnetworks_scoped_list in aggregated_list:
+                if subnetworks_scoped_list.subnetworks:
+                    for subnetwork in subnetworks_scoped_list.subnetworks:
+                        if subnetwork.network == network.self_link:
+
+                            # Get the region name from the region URI
+                            region = region_uri.split('/')[-1]
+
+                            # Delete the subnet
+                            operation = subnetworks_client.delete(project=project_id, region=region, subnetwork=subnetwork.name)
+                            operation.result()
+
+            # Delete the VPC
+            operation = client.delete(project=project_id, network=row['name'])
+            operation.result()
+
+            df.at[index, 'resource_id'] = pd.NA
+
 def main():
 
     if len(sys.argv) < 2:
@@ -92,9 +164,11 @@ def main():
     if delete_flag == "--delete":
         delete_aws_vpcs(df)
         delete_azure_vnets(df)
+        delete_gcp_vpcs(df)
     else:
         create_aws_vpcs(df)
         create_azure_vnets(df)
+        create_gcp_vpcs(df)
 
     df.to_csv(filename, index=False)
 
