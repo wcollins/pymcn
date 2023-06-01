@@ -82,7 +82,7 @@ def delete_azure_vnets(df):
 def main():
 
     if len(sys.argv) < 2:
-        print("Usage: python manage_vpcs.py <filename> [--delete]")
+        print("Usage: python pymcn.py <networks.csv> [--delete]")
         sys.exit(1)
 
     filename = sys.argv[1]
