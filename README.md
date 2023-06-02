@@ -36,7 +36,7 @@ CSV file should contain the following columns:
 
 ### Example .csv values
 | name | cloud | region | cidr | num_subnets | resource_group | project_id | resource_id |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | vpc-01-npe | aws | us-east-1 | 10.1.0.0/16 | 1 |  |  |  |
 | vpc-02-npe | aws | us-east-2 | 10.2.0.0/16 | 2 |  |  |  |
 | vnet-01-npe | azure | eastus2 | 10.3.0.0/16 | 1 | rg-eastus2 |  |  |
