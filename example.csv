@@ -1,7 +1,7 @@
-﻿name,region,cloud,cidr,resource_group,project_id,resource_id
-vpc-01,us-east-1,aws,10.1.0.0/16,,,
-vpc-02,us-east-2,aws,10.2.0.0/16,,,
-vnet-01,eastus2,azure,10.3.0.0/16,resource-group-a,,
-vnet-02,centralus,azure,10.4.0.0/16,resource-group-b,,
-vpc-01,us-east4,gcp,10.5.0.0/16,,project-a,
-vpc-02,us-central1,gcp,10.6.0.0/16,,project-b,
+﻿name,region,cloud,cidr,num_subnets,resource_group,project_id,resource_id
+vpc-01,us-east-1,aws,10.1.0.0/16,,,,
+vpc-02,us-east-2,aws,10.2.0.0/16,,,,
+vnet-01,eastus2,azure,10.3.0.0/16,,resource-group-a,,
+vnet-02,centralus,azure,10.4.0.0/16,,resource-group-b,,
+vpc-01,us-east4,gcp,10.5.0.0/16,,,project-a,
+vpc-02,us-central1,gcp,10.6.0.0/16,,,project-b,
