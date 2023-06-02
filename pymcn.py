@@ -153,14 +153,17 @@ def delete_gcp_vpcs(df):
 
 def main():
 
+    # Usage
     if len(sys.argv) < 2:
         print("Usage: python pymcn.py <networks.csv> [--delete]")
         sys.exit(1)
 
+    # Load complete spreadsheet
     filename = sys.argv[1]
     delete_flag = sys.argv[2] if len(sys.argv) > 2 else None
     df = pd.read_csv(filename)
 
+    # Is delete flag?
     if delete_flag == "--delete":
         delete_aws_vpcs(df)
         delete_azure_vnets(df)
