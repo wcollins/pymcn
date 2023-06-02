@@ -21,7 +21,7 @@ def create_aws_vpcs(df):
 
             networks = list(IPNetwork(row['cidr']).subnet(24))
 
-            for i in range(2):
+            for i in range(int(row['num_subnets'])):
                 subnet = ec2_resource.create_subnet(VpcId=vpc.id, CidrBlock=str(networks[i]))
 
 def delete_aws_vpcs(df):
@@ -65,7 +65,7 @@ def create_azure_vnets(df):
 
             networks = list(IPNetwork(row['cidr']).subnet(24))
 
-            for i in range(2):
+            for i in range(int(row['num_subnets'])):
                 subnet_params = Subnet(address_prefix=str(networks[i]))
                 network_client.subnets.begin_create_or_update(row['resource_group'], vnet.name, 'subnet' + str(i), subnet_params)
 
@@ -106,8 +106,7 @@ def create_gcp_vpcs(df):
 
                 subnetwork_client = compute_v1.SubnetworksClient()
 
-                num_of_subnets = 2  # Change this to the number of subnets you want to create
-                for i in range(num_of_subnets):
+                for i in range(int(row['num_subnets'])):
                     subnet = compute_v1.Subnetwork(
                         name='subnet' + str(i),
                         ip_cidr_range=str(networks[i]),
