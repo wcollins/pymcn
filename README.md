@@ -1,5 +1,5 @@
 ## pyMCN _(Python Multi-Cloud Networking)_
-Part of my daily routine involves prototyping environments for scenarios spanning multiple _public cloud_ providers. This Python script creates and deletes _networks_ and _subnets_ across **AWS**, **Azure**, and **GCP** from a _.csv_. Once the networks are provisioned, it returns and appends the _id_ of each network to the spreadsheet so it can _delete_ the resource when needed.
+Part of my daily routine involves prototyping environments for scenarios spanning multiple _public cloud_ providers. This Python script creates and deletes _networks_ and _subnets_ across **AWS**, **Azure**, and **GCP** from a _.xlsx_. Once the networks are provisioned, it returns and appends the _id_ of each network to the spreadsheet so it can _delete_ the resource when needed.
 
 :warning: **WARNING**
 This is not a _production-grade_ application. Use at your own risk!
@@ -23,7 +23,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=credentials.json
 ```
 
 ## Usage
-CSV file should contain the following columns:
+Excel _.xlsx_ file should contain the following columns:
 
 - name: The name of the network
 - cloud: The cloud provider. Valid options are 'aws', 'azure', or 'gcp'
@@ -34,7 +34,7 @@ CSV file should contain the following columns:
 - project_id: _(For GCP only)_ The _id_ of the project in which to create the VPC.
 - resource_id: **Leave this empty**; It will be filled with the _id_ of the resource
 
-### Example .csv values
+### Example .xlsx values
 | name | cloud | region | cidr | num_subnets | resource_group | project_id | resource_id |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | vpc-01-npe | aws | us-east-1 | 10.1.0.0/16 | 1 |  |  |  |
@@ -47,7 +47,7 @@ CSV file should contain the following columns:
 ### Creating Networks
 Networks can be created using the following:
 ```bash
-python3 pymcn.py networks.csv
+python3 pymcn.py networks.xlsx
 ```
 
 > It will then append the _id_ of each network created to the _resource_id_ column
@@ -55,7 +55,7 @@ python3 pymcn.py networks.csv
 ### Deleting Networks
 Networks can be deleted using the following:
 ```bash
-python3 pymcn.py networks.csv --delete
+python3 pymcn.py networks.xlsx --delete
 ```
 
 > The _id_ of each network existing under the _resource_id_ column will be used to reference the network being deleted
