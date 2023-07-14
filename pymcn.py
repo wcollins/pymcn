@@ -186,25 +186,24 @@ class CloudManager:
             self.delete_aws_vpcs()
             self.delete_azure_vnets()
             self.delete_gcp_vpcs()
+
+        # Is not delete flag?
         else:
             self.create_aws_vpcs()
             self.create_azure_vnets()
             self.create_gcp_vpcs()
 
-        self.df.to_csv(self.filename, index=False)
+        self.df.to_excel(self.filename, index=False)
 
 
 def main():
-
-    # Usage
     if len(sys.argv) < 2:
-        print("Usage: python3 pymcn.py <networks.csv> [--delete]")
+        print("Usage: python3 pymcn.py <networks.xlsx> [--delete]")
         sys.exit(1)
 
-    # Load complete spreadsheet
     filename = sys.argv[1]
     delete_flag = sys.argv[2] if len(sys.argv) > 2 else None
-    df = pd.read_csv(filename)
+    df = pd.read_excel(filename)
 
     manager = CloudManager(df, filename)
     manager.process_networks(delete_flag)
