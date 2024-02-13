@@ -1,5 +1,6 @@
 import sys
 import os
+import threading
 import boto3
 import pandas as pd
 from netaddr import IPNetwork
@@ -161,7 +162,6 @@ class CloudManager:
         print("Starting GCP VPC deletion...")
         for index, row in self.df.iterrows():
             if row['cloud'] == 'gcp' and not pd.isnull(row['network_id']):
-                # Move the assignment of project_id here, before it's used
                 project_id = row['project_id']
                 print(f"Attempting to delete GCP VPC {row['name']} in project {project_id}")
                 client = compute_v1.NetworksClient()
@@ -192,16 +192,22 @@ class CloudManager:
                     print(f"Unexpected error: {e}")
 
     def process_networks(self, delete_flag=None):
+        threads = []
         if delete_flag == "--delete":
             print("Deleting networks based on DataFrame...")
-            self.delete_aws_vpcs()
-            self.delete_azure_vnets()
-            self.delete_gcp_vpcs()
+            threads.append(threading.Thread(target=self.delete_aws_vpcs))
+            threads.append(threading.Thread(target=self.delete_azure_vnets))
+            threads.append(threading.Thread(target=self.delete_gcp_vpcs))
         else:
             print("Creating networks based on DataFrame...")
-            self.create_aws_vpcs()
-            self.create_azure_vnets()
-            self.create_gcp_vpcs()
+            threads.append(threading.Thread(target=self.create_aws_vpcs))
+            threads.append(threading.Thread(target=self.create_azure_vnets))
+            threads.append(threading.Thread(target=self.create_gcp_vpcs))
+
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
 
         print(f"Saving DataFrame to {self.filename}")
         self.df.to_excel(self.filename, index=False)
